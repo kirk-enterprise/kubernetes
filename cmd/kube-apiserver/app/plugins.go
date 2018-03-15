@@ -28,6 +28,7 @@ import (
 	"k8s.io/kubernetes/plugin/pkg/admission/admit"
 	"k8s.io/kubernetes/plugin/pkg/admission/alwayspullimages"
 	"k8s.io/kubernetes/plugin/pkg/admission/antiaffinity"
+	"k8s.io/kubernetes/plugin/pkg/admission/decorategpupod"
 	"k8s.io/kubernetes/plugin/pkg/admission/defaulttolerationseconds"
 	"k8s.io/kubernetes/plugin/pkg/admission/deny"
 	"k8s.io/kubernetes/plugin/pkg/admission/exec"
@@ -35,6 +36,7 @@ import (
 	"k8s.io/kubernetes/plugin/pkg/admission/imagepolicy"
 	"k8s.io/kubernetes/plugin/pkg/admission/initialization"
 	"k8s.io/kubernetes/plugin/pkg/admission/initialresources"
+	"k8s.io/kubernetes/plugin/pkg/admission/limitpolicy"
 	"k8s.io/kubernetes/plugin/pkg/admission/limitranger"
 	"k8s.io/kubernetes/plugin/pkg/admission/namespace/autoprovision"
 	"k8s.io/kubernetes/plugin/pkg/admission/namespace/exists"
@@ -49,7 +51,6 @@ import (
 	"k8s.io/kubernetes/plugin/pkg/admission/serviceaccount"
 	"k8s.io/kubernetes/plugin/pkg/admission/storageclass/setdefault"
 	"k8s.io/kubernetes/plugin/pkg/admission/webhook"
-	"k8s.io/kubernetes/plugin/pkg/admission/decorategpupod"
 )
 
 // registerAllAdmissionPlugins registers all admission plugins
@@ -79,4 +80,5 @@ func registerAllAdmissionPlugins(plugins *admission.Plugins) {
 	setdefault.Register(plugins)
 	webhook.Register(plugins)
 	decorategpupod.Register(plugins)
+	limitpolicy.Register(plugins)
 }
