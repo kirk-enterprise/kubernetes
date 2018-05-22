@@ -739,7 +739,7 @@ func PodFitsResources(pod *v1.Pod, meta algorithm.PredicateMetadata, nodeInfo *s
 
 	cpuOvercommitRatio := kubeletutil.GetCPUOvercommitRatio(node)
 	allocatable := nodeInfo.AllocatableResource()
-	glog.V(4).Infof("[k8s.qiniu.com/cpu_overcommit_ratio]: ratio: %v, allocatable.MilliCPU: %v, podRequest.MilliCPU: %v, nodeInfo.RequestedResource().MilliCPU: %v", cpuOvercommitRatio, allocatable.MilliCPU, podRequest.MilliCPU, nodeInfo.RequestedResource().MilliCPU)
+	glog.V(4).Infof("[k8s.qiniu.com/cpu-overcommit-ratio]: ratio: %v, allocatable.MilliCPU: %v, podRequest.MilliCPU: %v, nodeInfo.RequestedResource().MilliCPU: %v", cpuOvercommitRatio, allocatable.MilliCPU, podRequest.MilliCPU, nodeInfo.RequestedResource().MilliCPU)
 	if allocatable.MilliCPU < int64(float64(podRequest.MilliCPU+nodeInfo.RequestedResource().MilliCPU)/cpuOvercommitRatio) {
 		predicateFails = append(predicateFails, NewInsufficientResourceError(v1.ResourceCPU, podRequest.MilliCPU, nodeInfo.RequestedResource().MilliCPU, allocatable.MilliCPU))
 	}
