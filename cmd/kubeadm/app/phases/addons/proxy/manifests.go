@@ -76,6 +76,9 @@ spec:
         - /usr/local/bin/kube-proxy
         - --kubeconfig=/var/lib/kube-proxy/kubeconfig.conf
         {{ .ClusterCIDR }}
+        {{ if .MasqueradeConfig }}
+        {{ .MasqueradeConfig }}
+        {{ end }}
         securityContext:
           privileged: true
         volumeMounts:
