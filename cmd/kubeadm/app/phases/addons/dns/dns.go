@@ -29,6 +29,7 @@ import (
 	clientset "k8s.io/client-go/kubernetes"
 	kubeadmapi "k8s.io/kubernetes/cmd/kubeadm/app/apis/kubeadm"
 	kubeadmconstants "k8s.io/kubernetes/cmd/kubeadm/app/constants"
+	"k8s.io/kubernetes/cmd/kubeadm/app/features"
 	kubeadmutil "k8s.io/kubernetes/cmd/kubeadm/app/util"
 	"k8s.io/kubernetes/cmd/kubeadm/app/util/apiclient"
 	"k8s.io/kubernetes/pkg/api"
@@ -53,13 +54,14 @@ func EnsureDNSAddon(cfg *kubeadmapi.MasterConfiguration, client clientset.Interf
 
 	// Get the YAML manifest conditionally based on the k8s version
 	kubeDNSDeploymentBytes := GetKubeDNSManifest(k8sVersion)
-	dnsDeploymentBytes, err := kubeadmutil.ParseTemplate(kubeDNSDeploymentBytes, struct{ ImageRepository, Arch, Version, DNSDomain, MasterTaintKey string }{
+	dnsDeploymentBytes, err := kubeadmutil.ParseTemplate(kubeDNSDeploymentBytes, struct{ ImageRepository, Arch, Version, DNSDomain, MasterTaintKey, HostNetwork string }{
 		ImageRepository: cfg.ImageRepository,
 		Arch:            runtime.GOARCH,
 		// Get the kube-dns version conditionally based on the k8s version
 		Version:        GetKubeDNSVersion(k8sVersion),
 		DNSDomain:      cfg.Networking.DNSDomain,
 		MasterTaintKey: kubeadmconstants.LabelNodeRoleMaster,
+		HostNetwork:    getHostNetworkConfig(cfg.FeatureGates),
 	})
 	if err != nil {
 		return fmt.Errorf("error when parsing kube-dns deployment template: %v", err)
@@ -144,4 +146,12 @@ func getDNSIP(client clientset.Interface) (net.IP, error) {
 		return nil, fmt.Errorf("could not parse dns ip %q: %v", dnsIP, err)
 	}
 	return dnsIP, nil
+}
+
+func getHostNetworkConfig(featureGates map[string]bool) string {
+	if flag, ok := featureGates[string(features.KubeDNSHostNetwork)]; ok && flag {
+		return "hostNetwork: true"
+	}
+
+	return ""
 }

@@ -34,6 +34,9 @@ const (
 
 	// KubeProxyEnableMasquerade
 	KubeProxyEnableMasquerade utilfeature.Feature = "KubeProxyEnableMasquerade"
+
+	// KubeDnsHostNetwork
+	KubeDNSHostNetwork utilfeature.Feature = "KubeDNSHostNetwork"
 )
 
 // FeatureList represents a list of feature gates
@@ -69,6 +72,7 @@ var InitFeatureGates = FeatureList{
 	SelfHosting:               {Default: false, PreRelease: utilfeature.Alpha},
 	StoreCertsInSecrets:       {Default: false, PreRelease: utilfeature.Alpha},
 	KubeProxyEnableMasquerade: {Default: false, PreRelease: utilfeature.Alpha},
+	KubeDNSHostNetwork:        {Default: false, PreRelease: utilfeature.Alpha},
 }
 
 // KnownFeatures returns a slice of strings describing the FeatureList features.
