@@ -29,10 +29,6 @@ dump_output() {
 
 trap 'dump_output' EXIT
 
-if [[ "$TARGET" == "test-integration" ]]; then
-    ./hack/install-etcd.sh
-fi
-
 kube::test::find_dirs() {
   (
     cd ${KUBE_ROOT}
@@ -57,16 +53,19 @@ kube::test::find_dirs() {
   )
 }
 
-TESTS=${TESTS:-}
-
-if [ -z "$TESTS" ]; then
-    TESTS=($(kube::test::find_dirs))
-fi
-
 args=(
     $TARGET
-    TESTS="${TESTS[@]}"
 )
+
+if [[ "$TARGET" == "test-integration" ]]; then
+    ./hack/install-etcd.sh
+elif [[ "$TARGET" == "test" ]]; then
+    TESTS=${TESTS:-}
+    if [ -z "$TESTS" ]; then
+        TESTS=($(kube::test::find_dirs))
+    fi
+    args+=(TESTS="${TESTS[@]}")
+fi
 
 if [ -n "${TRAVIS:-}" ]; then
     # Resource in travis is low, slow down and increase timeout.
@@ -75,7 +74,7 @@ if [ -n "${TRAVIS:-}" ]; then
     export KUBE_TIMEOUT=${KUBE_TIMEOUT:-"--timeout 300s"}
     # Don't build for all platforms, because it may exceeed travis 2 hours
     # limit.
-    export KUBE_FASTBUILD=true 
+    export KUBE_FASTBUILD=true
 fi
 
 # pass all KUBE_ environments
@@ -85,5 +84,10 @@ while IFS='=' read -r -d '' n v; do
     fi
 done < <(env -0)
 
-echo ./build/run.sh make "${args[@]}"
-./build/run.sh make "${args[@]}" &> $LOGFILE
+if [[ "$TARGET" == "verify" ]]; then
+    go get -u github.com/golang/lint/golint
+    ./hack/verify-golint.sh
+else
+    echo "./build/run.sh make \"${args[@]}\" &> $LOGFILE"
+    ./build/run.sh make "${args[@]}" &> $LOGFILE
+fi
