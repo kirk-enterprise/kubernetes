@@ -541,6 +541,30 @@ type AcceleratorStats struct {
 	// Percent of time over the past sample period during which
 	// the accelerator was actively processing.
 	DutyCycle uint64 `json:"duty_cycle"`
+
+	// Utilization of encoder
+	EncoderUtilization uint64 `json:"encoder_utilization"`
+
+	// Utilization of decoder
+	DecoderUtilization uint64 `json:"decoder_utilization"`
+}
+
+type ProcessStats struct {
+	// Number of processes
+	ProcessCount uint64 `json:"process_count"`
+
+	// Number of open file descriptors
+	FdCount uint64 `json:"fd_count"`
+}
+
+// per device GpuStats
+type GpuStats struct {
+	// key is gpu device id
+	SMUtils  map[string]string `json:"sm_utils"`
+	MemUtils map[string]string `json:"mem_utils"`
+	EncUtils map[string]string `json:"enc_utils"`
+	DecUtils map[string]string `json:"dec_utils"`
+	FBSize   map[string]string `json:"fb_size"`
 }
 
 type ContainerStats struct {
@@ -559,6 +583,12 @@ type ContainerStats struct {
 
 	// Metrics for Accelerators. Each Accelerator corresponds to one element in the array.
 	Accelerators []AcceleratorStats `json:"accelerators,omitempty"`
+
+	// ProcessStats for Containers
+	Processes ProcessStats `json:"processes,omitempty"`
+
+	// GPU statistics, key is device
+	GPU GpuStats `json:"gpu,omitempty"`
 
 	// Custom metrics from all collectors
 	CustomMetrics map[string][]MetricVal `json:"custom_metrics,omitempty"`
