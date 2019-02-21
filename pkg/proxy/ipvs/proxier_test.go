@@ -2595,6 +2595,7 @@ func TestCleanLegacyService(t *testing.T) {
 		nil,
 		nil,
 		DefaultScheduler,
+		false,
 		make([]string, 0),
 	)
 	if err != nil {
